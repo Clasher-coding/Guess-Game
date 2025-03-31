@@ -56,28 +56,18 @@ function loadGame(category) {
 
 
 function startBlurReduction() {
-    let blurValue = 15;
-    blurInterval = setInterval(() => {
-        if (blurValue > 0) {
-            blurValue -= 1;
-            image.style.filter = `blur(${blurValue}px)`;
-        } else {
-            clearInterval(blurInterval);
-        }
-    }, 1000);
+  
+    clearInterval(blurInterval);
 }
 
 
 function loadNext() {
     if (currentIndex < gameData.images.length) {
         image.src = gameData.images[currentIndex];
-        image.style.filter = "blur(15px)";
         dropZone.textContent = "Drop Here";
         dropZone.style.backgroundColor = "white";
         nextBtn.disabled = true;
         updateOptions();
-        clearInterval(blurInterval);
-        startBlurReduction();
     } else {
         alert("Congratulations! You've completed the game!");
     }
