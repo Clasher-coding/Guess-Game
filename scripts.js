@@ -74,6 +74,57 @@ function loadNext() {
 }
 
 
+function enableDragAndDrop(option) {
+    // Desktop drag-and-drop
+    option.addEventListener("dragstart", function(event) {
+        event.dataTransfer.setData("text", event.target.textContent);
+    });
+
+    // Mobile touch events
+    option.addEventListener("touchstart", function(event) {
+        event.target.classList.add("dragging");
+        event.dataTransfer = { text: event.target.textContent }; // Simulate dataTransfer for touch
+    });
+
+    option.addEventListener("touchmove", function(event) {
+        event.preventDefault();
+        const touch = event.touches[0];
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (element && element.id === "drop-zone") {
+            element.classList.add("hover");
+        } else {
+            dropZone.classList.remove("hover");
+        }
+    });
+
+    option.addEventListener("touchend", function(event) {
+        const draggingElement = document.querySelector(".dragging");
+        if (draggingElement) {
+            draggingElement.classList.remove("dragging");
+        }
+        const touch = event.changedTouches[0];
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (element && element.id === "drop-zone") {
+            const droppedText = event.target.textContent;
+            handleDrop(droppedText);
+        }
+        dropZone.classList.remove("hover");
+    });
+}
+
+function handleDrop(droppedText) {
+    if (droppedText === gameData.answers[currentIndex]) {
+        clearInterval(blurInterval);
+        image.style.filter = "blur(0px)";
+        dropZone.textContent = `Correct! It's a ${droppedText}!`;
+        dropZone.style.backgroundColor = "#2ecc71";
+        nextBtn.disabled = false;
+    } else {
+        dropZone.textContent = `Incorrect! Try Again!`;
+        dropZone.style.backgroundColor = "#e74c3c";
+    }
+}
+
 function updateOptions() {
     optionsContainer.innerHTML = "";
     let options = [...gameData.answers].sort(() => Math.random() - 0.5);
@@ -83,9 +134,7 @@ function updateOptions() {
         option.classList.add("option");
         option.draggable = true;
         option.textContent = optionText;
-        option.addEventListener("dragstart", function(event) {
-            event.dataTransfer.setData("text", event.target.textContent);
-        });
+        enableDragAndDrop(option);
         optionsContainer.appendChild(option);
     });
 }
@@ -98,16 +147,7 @@ dropZone.addEventListener("drop", function(event) {
     event.preventDefault();
     let droppedText = event.dataTransfer.getData("text");
 
-    if (droppedText === gameData.answers[currentIndex]) {
-        clearInterval(blurInterval);
-        image.style.filter = "blur(0px)";
-        dropZone.textContent = `Correct! It's a ${droppedText}!`;
-        dropZone.style.backgroundColor = "#2ecc71";
-        nextBtn.disabled = false;
-    } else {
-        dropZone.textContent = `Incorrect! Try Again!`;
-        dropZone.style.backgroundColor = "#e74c3c";
-    }
+    handleDrop(droppedText);
 });
 
 

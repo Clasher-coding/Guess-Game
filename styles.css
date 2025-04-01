@@ -196,6 +196,16 @@ body {
     color: white;
 }
 
+.dragging {
+    opacity: 0.5;
+    background-color: #dcdcdc;
+}
+
+#drop-zone.hover {
+    background-color: #f0f8ff;
+    border-color: #3498db;
+}
+
 #category-selector {
     padding: 10px;
     font-size: 16px;
